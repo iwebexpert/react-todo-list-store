@@ -2,42 +2,25 @@ import { useEffect, useState } from "react";
 import TotoItem from "./TotoItem";
 import SearchInput from "./SearchInput";
 import { useDebounce } from "../hooks/useDebounce";
-import { useTodoContext } from "../contexts/TodoContext";
+import { useTodoStore } from "../stores/useTodoStore";
 
 export default function TodoList() {
-  const { todos, addTask, toggleCompletion, deleteTask, setInitialTodos } =
-    useTodoContext();
+  const { todos, addTask, toggleCompletion, deleteTask, fetchTodos } =
+    useTodoStore();
   const [newTask, setNewTask] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearchValue = useDebounce(searchInput, 500);
 
   useEffect(() => {
-    // Асинхронный, выполняется после отрисовки
-    console.log("useEffect");
+    fetchTodos()
+  }, [fetchTodos]);
 
-    const fetchData = async () => {
-      try {
-        const res = await fetch(
-          "https://jsonplaceholder.typicode.com/todos?_limit=10"
-        );
-        const data = await res.json();
-        setInitialTodos(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const addTaskHandle = () => {
+    if(!newTask) return
 
-    fetchData();
-  }, []);
-
-  // useLayoutEffect(() => {
-  //   // Синхронный код
-  //   console.log("useLayoutEffect");
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log(`Введено в поле: ${newTask}`);
-  // }, [newTask]);
+    addTask(newTask)
+    setNewTask('')
+  }
 
   const filteredTodos = todos.filter((todo) =>
     todo.title
@@ -56,7 +39,7 @@ export default function TodoList() {
           onChange={(event) => setNewTask(event.target.value)}
           placeholder="Введите название для новой задачи"
         />
-        <button onClick={() => addTask(newTask)}>Добавить задачу</button>
+        <button onClick={addTaskHandle}>Добавить задачу</button>
       </div>
 
       <SearchInput searchData={searchInput} setSearchData={setSearchInput} />
