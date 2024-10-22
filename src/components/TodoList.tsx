@@ -1,10 +1,12 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TotoItem from "./TotoItem";
 import SearchInput from "./SearchInput";
 import { useDebounce } from "../hooks/useDebounce";
+import { useTodoContext } from "../contexts/TodoContext";
 
 export default function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const { todos, addTask, toggleCompletion, deleteTask, setInitialTodos } =
+    useTodoContext();
   const [newTask, setNewTask] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearchValue = useDebounce(searchInput, 500);
@@ -19,7 +21,7 @@ export default function TodoList() {
           "https://jsonplaceholder.typicode.com/todos?_limit=10"
         );
         const data = await res.json();
-        setTodos(data);
+        setInitialTodos(data);
       } catch (error) {
         console.log(error);
       }
@@ -28,47 +30,19 @@ export default function TodoList() {
     fetchData();
   }, []);
 
-  // Удаление задачи
-  const deleteTask = (id: number) => {
-    setTodos((prevState) => prevState.filter((todo) => todo.id !== id));
-  };
-
-  // Обновление статуса
-  const toggleCompletion = (id: number) => {
-    setTodos((prevState) =>
-      prevState.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  // Добавление новой задачи
-  const addTask = () => {
-    if (newTask.trim() === "") {
-      return;
-    }
-
-    const data: Todo = {
-      id: Date.now(),
-      title: newTask,
-      completed: false,
-    };
-
-    setTodos([data, ...todos]);
-    setNewTask("");
-  };
-
-  useLayoutEffect(() => {
-    // Синхронный код
-    console.log("useLayoutEffect");
-  }, []);
+  // useLayoutEffect(() => {
+  //   // Синхронный код
+  //   console.log("useLayoutEffect");
+  // }, []);
 
   // useEffect(() => {
   //   console.log(`Введено в поле: ${newTask}`);
   // }, [newTask]);
 
   const filteredTodos = todos.filter((todo) =>
-    todo.title.toLocaleLowerCase().includes(debouncedSearchValue.toLocaleLowerCase())
+    todo.title
+      .toLocaleLowerCase()
+      .includes(debouncedSearchValue.toLocaleLowerCase())
   );
 
   return (
@@ -82,7 +56,7 @@ export default function TodoList() {
           onChange={(event) => setNewTask(event.target.value)}
           placeholder="Введите название для новой задачи"
         />
-        <button onClick={addTask}>Добавить задачу</button>
+        <button onClick={() => addTask(newTask)}>Добавить задачу</button>
       </div>
 
       <SearchInput searchData={searchInput} setSearchData={setSearchInput} />

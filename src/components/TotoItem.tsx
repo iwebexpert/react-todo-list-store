@@ -1,15 +1,19 @@
+import React from "react";
+
 interface TotoItemProps extends Todo {
   deleteTask: (id: number) => void;
   toggleCompletion: (id: number) => void;
 }
 
-export default function TotoItem({
+function TotoItem({
   id,
   title,
   completed,
   deleteTask,
   toggleCompletion,
 }: TotoItemProps) {
+  // console.log('Render TotoItem');
+
   return (
     <li style={{ display: "flex", justifyContent: "space-between" }}>
       <span
@@ -25,3 +29,5 @@ export default function TotoItem({
     </li>
   );
 }
+
+export default React.memo(TotoItem);

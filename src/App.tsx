@@ -1,15 +1,23 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import './App.css'
-import TodoList from './components/TodoList'
+import "./App.css";
+import Header from "./components/Header";
+import ThemeSwitch from "./components/ThemeSwitch";
+import TodoList from "./components/TodoList";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { TodoProvider } from "./contexts/TodoContext";
 
 function App() {
   return (
-   <div>
-    <TodoList />
-   </div>
-  )
+    <ThemeProvider>
+      <TodoProvider>
+        <div>
+          <Header />
+          <ThemeSwitch />
+          <hr />
+          <TodoList />
+        </div>
+      </TodoProvider>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
